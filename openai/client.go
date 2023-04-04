@@ -19,7 +19,7 @@ type clientImpl struct {
 }
 
 func (c clientImpl) GetChatCompletion(ctx context.Context, req ChatCompletionRequest) (*ChatCompletionResponse, error) {
-	httpCient := http.Client{}
+	httpClient := http.Client{}
 
 	body, err := json.Marshal(req)
 
@@ -38,7 +38,7 @@ func (c clientImpl) GetChatCompletion(ctx context.Context, req ChatCompletionReq
 	httpReq.Header.Set("Content-Type", "application/json")
 	httpReq.Header.Set("Authorization", fmt.Sprint("Bearer ", os.Getenv("OPEN_AI_API_KEY")))
 
-	resp, err := httpCient.Do(httpReq)
+	resp, err := httpClient.Do(httpReq)
 
 	if err != nil {
 		return nil, err

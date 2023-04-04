@@ -3,12 +3,12 @@ package ui
 import (
 	"context"
 	"fmt"
+	"github.com/gookit/slog"
 
 	"github.com/charmbracelet/bubbles/textarea"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/gookit/slog"
 	"github.com/robbailey3/openai-cli/openai"
 )
 
@@ -69,11 +69,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		if !m.ready {
-			// Since this program is using the full size of the viewport we
-			// need to wait until we've received the window dimensions before
-			// we can initialize the viewport. The initial dimensions come in
-			// quickly, though asynchronously, which is why we wait for them
-			// here.
 			m.viewport = viewport.New(msg.Width, msg.Height-m.textarea.Height()-2)
 			m.textarea.SetWidth(msg.Width)
 			m.ready = true
@@ -95,6 +90,15 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				Content: m.textarea.Value(),
 				Role:    "user",
 			})
+			m.textarea.Reset()
+			msgStr := ""
+			for _, mess := range m.messages {
+				msgStr += m.getStyledMessage(mess) + "\n"
+			}
+			if m.isLoading {
+				msgStr += m.getLoadingMessage()
+			}
+			m.viewport.SetContent(msgStr)
 			return m, m.SendMessage(m.textarea.Value())
 		}
 
@@ -109,12 +113,20 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		for _, mess := range m.messages {
 			msgStr += m.getStyledMessage(mess) + "\n"
 		}
+		if m.isLoading {
+			msgStr += m.getLoadingMessage()
+		}
 		m.viewport.SetContent(msgStr)
-		m.textarea.Reset()
 		m.viewport.GotoBottom()
 	}
 
 	return m, tea.Batch(tiCmd, vpCmd)
+}
+
+func (m Model) getLoadingMessage() string {
+	row := lipgloss.NewStyle().Width(m.viewport.Width).AlignHorizontal(lipgloss.Left).PaddingLeft(2)
+	chatBox := lipgloss.NewStyle().Width(m.viewport.Width / 2).BorderStyle(lipgloss.RoundedBorder()).BorderForeground(lipgloss.Color("#11349c"))
+	return row.Render(chatBox.Render("..."))
 }
 
 func (m Model) getStyledMessage(msg openai.ChatMessage) string {
@@ -139,6 +151,11 @@ func (m Model) View() string {
 
 func (m Model) SendMessage(message string) tea.Cmd {
 	return func() tea.Msg {
+		// return completionMsg(openai.ChatMessage{
+		//   Role:    "assistant",
+		//   Content: "Hello",
+		// })
+
 		completion, err := m.openAiClient.GetChatCompletion(context.Background(), openai.ChatCompletionRequest{
 			Model:            "gpt-4",
 			Messages:         m.messages,
