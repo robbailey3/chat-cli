@@ -1,4 +1,4 @@
-module github.com/robbailey3/openai-cli
+module github.com/robbailey3/chat-cli
 
 go 1.19
 

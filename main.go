@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/gookit/slog"
-	"github.com/robbailey3/openai-cli/cmd"
+	"github.com/robbailey3/chat-cli/cmd"
 )
 
 func main() {

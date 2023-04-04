@@ -9,7 +9,7 @@ import (
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/robbailey3/openai-cli/openai"
+	"github.com/robbailey3/chat-cli/openai"
 )
 
 type (

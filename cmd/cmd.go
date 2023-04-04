@@ -5,7 +5,7 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/gookit/slog"
-	"github.com/robbailey3/openai-cli/ui"
+	"github.com/robbailey3/chat-cli/ui"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -18,31 +18,15 @@ var (
 		Short: "A basic CLI for interacting with ChatGPT by openAI",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
-			p := tea.NewProgram(ui.NewModel())
+			p := tea.NewProgram(
+				ui.NewModel(),
+				tea.WithAltScreen(),
+				tea.WithMouseCellMotion(),
+			)
 
 			if _, err := p.Run(); err != nil {
 				slog.Error(err)
 			}
-			// client := openai.NewClient()
-			//
-			// completion, err := client.GetChatCompletion(context.Background(), openai.ChatCompletionRequest{
-			//   Messages: []openai.ChatMessage{
-			//     openai.ChatMessage{
-			//       Role:    "user",
-			//       Content: "Say how good I am at making ChatGPT work from my Golang CLI. Sing my praises!",
-			//     },
-			//   },
-			//   Model:       "gpt-4",
-			//   N:           1,
-			//   Temperature: 1,
-			//   TopP:        1,
-			//   MaxTokens:   250,
-			// })
-			// if err != nil {
-			//   slog.Error(err)
-			//   return
-			// }
-			// slog.Info(completion)
 		},
 	}
 )
@@ -69,7 +53,7 @@ func initConfig() {
 		// Search config in home directory with name ".cobra" (without extension).
 		viper.AddConfigPath(home)
 		viper.SetConfigType("yaml")
-		viper.SetConfigName(".openai-cli")
+		viper.SetConfigName(".chat-cli")
 	}
 
 	viper.AutomaticEnv()
