@@ -1,12 +1,13 @@
 package cmd
 
 import (
+	"os"
+
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/gookit/slog"
 	"github.com/robbailey3/openai-cli/ui"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"os"
 )
 
 var (
@@ -74,7 +75,6 @@ func initConfig() {
 	viper.AutomaticEnv()
 
 	if err := viper.ReadInConfig(); err == nil {
-		slog.Info("Using config file:", viper.ConfigFileUsed())
 		key := viper.Get("openAi.apiKey")
 		err := os.Setenv("OPEN_AI_API_KEY", key.(string))
 		if err != nil {
